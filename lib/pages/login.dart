@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'signup.dart'; // আপনার SignUp page import করুন - file name অনুযায়ী change করুন
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -145,8 +146,11 @@ class _LoginState extends State<Login> {
                         const SizedBox(width: 5),
                         TextButton(
                           onPressed: () {
-                            // Sign up functionality - navigate to sign up page
-                            print('Navigate to Sign Up page');
+                            // Direct navigation to Sign Up page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignUp()),
+                            );
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
