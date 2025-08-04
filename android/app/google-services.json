@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "381779812474",
+    "project_id": "zesh-app-7ecd0",
+    "storage_bucket": "zesh-app-7ecd0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381779812474:android:e14eeb3b418bedbf9edbc3",
+        "android_client_info": {
+          "package_name": "com.example.zesh_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwyuWJ25Cuz4YZG7xcUF5C9bRhVTOau-o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
