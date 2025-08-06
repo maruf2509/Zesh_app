@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'signup.dart'; // আপনার SignUp page import করুন - file name অনুযায়ী change করুন
+import 'package:firebase_auth/firebase_auth.dart';
+import 'signup.dart';
+import 'home.dart'; // Import the new home screen
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,6 +14,72 @@ class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
+
+  Future<void> _signInUser() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      _showSnackBar('Please fill all fields', Colors.red);
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      _showSnackBar('Login successful!', Colors.green);
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = 'No user found for that email.';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Wrong password provided for that user.';
+          break;
+        case 'invalid-email':
+          errorMessage = 'The email address is not valid.';
+          break;
+        case 'user-disabled':
+          errorMessage = 'This user has been disabled.';
+          break;
+        default:
+          errorMessage = 'Login failed: ${e.message}';
+      }
+      _showSnackBar(errorMessage, Colors.red);
+    } catch (e) {
+      _showSnackBar('An unexpected error occurred: $e', Colors.red);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showSnackBar(String message, Color backgroundColor) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: backgroundColor,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +90,6 @@ class _LoginState extends State<Login> {
             child: Image.asset("images/img.png", fit: BoxFit.cover),
           ),
 
-        
           SafeArea(
             child: Align(
               alignment: Alignment(0, 0.7),
@@ -95,18 +162,14 @@ class _LoginState extends State<Login> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
-                          //  Firebase authentication add
-                          print('Email: ${_emailController.text}');
-                          print('Password: ${_passwordController.text}');
-                        },
+                        onPressed: _isLoading ? null : _signInUser,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(
+                          backgroundColor: Color.fromARGB(
                             255,
                             54,
                             73,
                             88,
-                          ).withOpacity(0.8),
+                          ).withAlpha((0.8 * 255).round()),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25),
@@ -114,13 +177,22 @@ class _LoginState extends State<Login> {
                           elevation: 5,
                           shadowColor: Colors.black54,
                         ),
-                        child: const Text(
-                          'Log In',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              'Log In',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       ),
                     ),
                     const SizedBox(height: 20),

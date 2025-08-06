@@ -1,5 +1,6 @@
 import 'package:zesh_app/pages/login.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,6 +11,13 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isDarkMode = false;
+  User? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = FirebaseAuth.instance.currentUser;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +37,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildProfileHeader(),
           const SizedBox(height: 20),
           _buildProfileItem(
-            icon: Icons.person_outline,
-            text: 'Login',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Login()),
-              );
+            icon: Icons.logout,
+            text: 'Logout',
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              _navigateToLoginAndRemoveUntil();
             },
           ),
           const Padding(
@@ -86,15 +92,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         const CircleAvatar(
           radius: 50,
-          backgroundImage: AssetImage('assets/logo.png'),
+          backgroundImage: AssetImage('images/logo.png'),
         ),
         const SizedBox(height: 10),
-        const Text(
-          'Zesh',
+        Text(
+          _currentUser?.displayName ?? 'N/A',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 5),
-        const Text('zesh@gmail.com', style: TextStyle(color: Colors.grey)),
+        Text(_currentUser?.email ?? 'N/A', style: TextStyle(color: Colors.grey)),
         const SizedBox(height: 10),
         ElevatedButton(
           onPressed: () {},
@@ -152,6 +158,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         },
         activeColor: Colors.blue,
       ),
+    );
+  }
+
+  void _navigateToLoginAndRemoveUntil() {
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const Login()),
+      (Route<dynamic> route) => false,
     );
   }
 }

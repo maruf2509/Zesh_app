@@ -3,21 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
 
-void main() {
-  runApp(const MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SignUp(),
-    );
-  }
-}
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -46,22 +32,30 @@ class _SignUpState extends State<SignUp> {
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _retypePasswordController.text.isEmpty) {
-      _showSnackBar('Please fill all fields', Colors.red);
+      if (mounted) {
+        _showSnackBar('Please fill all fields', Colors.red);
+      }
       return;
     }
 
     if (_passwordController.text != _retypePasswordController.text) {
-      _showSnackBar('Passwords do not match', Colors.red);
+      if (mounted) {
+        _showSnackBar('Passwords do not match', Colors.red);
+      }
       return;
     }
 
     if (_passwordController.text.length < 6) {
-      _showSnackBar('Password must be at least 6 characters', Colors.red);
+      if (mounted) {
+        _showSnackBar('Password must be at least 6 characters', Colors.red);
+      }
       return;
     }
 
     if (!agree) {
-      _showSnackBar('Please agree to Terms & Privacy', Colors.red);
+      if (mounted) {
+        _showSnackBar('Please agree to Terms & Privacy', Colors.red);
+      }
       return;
     }
 
@@ -88,15 +82,14 @@ class _SignUpState extends State<SignUp> {
       });
 
       // Show success message
-      _showSnackBar('Account created successfully!', Colors.green);
+      if (mounted) {
+        _showSnackBar('Account created successfully!', Colors.green);
+      }
 
       // Navigate to Login page after successful signup
       if (mounted) {
         await Future.delayed(const Duration(seconds: 1));
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Login()),
-        );
+        _navigateToLogin();
       }
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -116,9 +109,13 @@ class _SignUpState extends State<SignUp> {
         default:
           errorMessage = 'Sign up failed: ${e.message}';
       }
-      _showSnackBar(errorMessage, Colors.red);
+      if (mounted) {
+        _showSnackBar(errorMessage, Colors.red);
+      }
     } catch (e) {
-      _showSnackBar('An unexpected error occurred', Colors.red);
+      if (mounted) {
+        _showSnackBar('An unexpected error occurred', Colors.red);
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -128,8 +125,17 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
+  void _navigateToLogin() {
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Login()),
+    );
+  }
+
   // Show SnackBar for messages
   void _showSnackBar(String message, Color backgroundColor) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
