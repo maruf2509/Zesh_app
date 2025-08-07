@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:zesh_app/pages/forget_pass.dart';
 import 'package:zesh_app/pages/login.dart';
 import 'package:provider/provider.dart';
 import 'package:zesh_app/providers/favorites_provider.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Login(),
+      home:Login(),
     );
   }
 }
