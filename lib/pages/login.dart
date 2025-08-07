@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'signup.dart';
 import 'home.dart';
+import 'forget_pass.dart'; // 🔹 Forgot Password page import
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -91,13 +92,13 @@ class _LoginState extends State<Login> {
           Positioned.fill(
             child: Image.asset("images/img.png", fit: BoxFit.cover),
           ),
-
           SafeArea(
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Email Field
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: BackdropFilter(
@@ -107,12 +108,7 @@ class _LoginState extends State<Login> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(color: Colors.white, width: 2),
-                          color: const Color.fromARGB(
-                            0,
-                            0,
-                            0,
-                            0,
-                          ).withOpacity(0.1),
+                          color: const Color.fromARGB(0, 0, 0, 0).withOpacity(0.1),
                         ),
                         child: TextField(
                           controller: _emailController,
@@ -121,15 +117,9 @@ class _LoginState extends State<Login> {
                           decoration: const InputDecoration(
                             hintText: 'Email or Phone',
                             hintStyle: TextStyle(color: Colors.white70),
-                            prefixIcon: Icon(
-                              Icons.person_outline,
-                              color: Colors.white,
-                            ),
+                            prefixIcon: Icon(Icons.person_outline, color: Colors.white),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 16,
-                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           ),
                         ),
                       ),
@@ -137,6 +127,7 @@ class _LoginState extends State<Login> {
                   ),
                   const SizedBox(height: 20),
 
+                  // Password Field
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: BackdropFilter(
@@ -146,12 +137,7 @@ class _LoginState extends State<Login> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(color: Colors.white, width: 2),
-                          color: const Color.fromARGB(
-                            0,
-                            0,
-                            0,
-                            0,
-                          ).withOpacity(0.1),
+                          color: const Color.fromARGB(0, 0, 0, 0).withOpacity(0.1),
                         ),
                         child: TextField(
                           controller: _passwordController,
@@ -160,21 +146,17 @@ class _LoginState extends State<Login> {
                           decoration: const InputDecoration(
                             hintText: 'Password',
                             hintStyle: TextStyle(color: Colors.white70),
-                            prefixIcon: Icon(
-                              Icons.lock_outline,
-                              color: Colors.white,
-                            ),
+                            prefixIcon: Icon(Icons.lock_outline, color: Colors.white),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 16,
-                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           ),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Bottom Section
                   Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
@@ -184,17 +166,20 @@ class _LoginState extends State<Login> {
                         topRight: Radius.circular(40),
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 50.0,
-                      vertical: 15.0,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 15.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // 🔹 Forgot Password button with Navigator
                         Align(
                           alignment: Alignment.center,
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ForgotPassword()),
+                              );
+                            },
                             child: const Text(
                               'Forgot Password?',
                               style: TextStyle(
@@ -206,18 +191,14 @@ class _LoginState extends State<Login> {
                         ),
                         const SizedBox(height: 5),
 
+                        // Login Button
                         SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _signInUser,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                37,
-                                50,
-                                56,
-                              ),
+                              backgroundColor: const Color.fromARGB(255, 37, 50, 56),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
@@ -225,9 +206,7 @@ class _LoginState extends State<Login> {
                             ),
                             child: _isLoading
                                 ? const CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                   )
                                 : const Text(
                                     'Login',
@@ -246,6 +225,7 @@ class _LoginState extends State<Login> {
                         ),
                         const SizedBox(height: 15),
 
+                        // Create account button
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -253,18 +233,11 @@ class _LoginState extends State<Login> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => SignUp(),
-                                ),
+                                MaterialPageRoute(builder: (context) => SignUp()),
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                186,
-                                200,
-                                205,
-                              ),
+                              backgroundColor: const Color.fromARGB(255, 186, 200, 205),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
