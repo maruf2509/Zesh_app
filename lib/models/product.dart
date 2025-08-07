@@ -3,12 +3,14 @@ class Product {
   final String name;
   final String description;
   final double price;
+  final String category; // ✅ এই লাইনটা আছে তো?
 
   Product({
     required this.image,
     required this.name,
     required this.description,
     required this.price,
+    required this.category,
   });
 }
 
@@ -18,23 +20,27 @@ List<Product> demoProducts = [
     name: 'Bleu de Chanel',
     description: 'Elegant, deep and refined - embodies timeless confidence',
     price: 1200.0,
+    category: 'Chanel', // <-- category added
   ),
   Product(
     image: 'images/sauvage.png',
     name: 'Dior Sauvage',
-    description: 'Fresh, fierce and magnetic - captures raw musculinity',
+    description: 'Fresh, fierce and magnetic - captures raw masculinity',
     price: 1000.0,
+    category: 'Dior',
   ),
   Product(
     image: 'images/chanel.png',
     name: 'Chanel No. 5',
     description: 'A classic floral aldehyde fragrance for women',
     price: 1200.0,
+    category: 'Chanel',
   ),
   Product(
     image: 'images/sauvage.png',
     name: 'Aventus Creed',
     description: 'A fresh, woody, and amber fragrance for men',
     price: 1000.0,
+    category: 'Creed',
   ),
 ];
