@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
 
-
-
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
@@ -20,7 +18,8 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _retypePasswordController = TextEditingController();
+  final TextEditingController _retypePasswordController =
+      TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -65,13 +64,16 @@ class _SignUpState extends State<SignUp> {
 
     try {
       // Create user with Firebase Auth
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
 
       // Update user display name
-      await userCredential.user?.updateDisplayName(_fullNameController.text.trim());
+      await userCredential.user?.updateDisplayName(
+        _fullNameController.text.trim(),
+      );
 
       // Save additional user data to Firestore
       await _firestore.collection('users').doc(userCredential.user?.uid).set({
@@ -157,7 +159,14 @@ class _SignUpState extends State<SignUp> {
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(24.0, 70.0, 24.0, 40.0),
               decoration: const BoxDecoration(
-                color: Color.fromRGBO(43, 74, 77, 1),
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 49, 65, 73),
+                    Color.fromARGB(250, 37, 50, 56),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomCenter,
+                ),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
@@ -171,37 +180,37 @@ class _SignUpState extends State<SignUp> {
                     "Let's",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: 40,
                       fontWeight: FontWeight.w400,
                       height: 1.0,
                     ),
                   ),
-                  // "Create" - 2nd line 
+                  // "Create" - 2nd line
                   const Text(
                     "Create",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                       height: 0.9,
                     ),
                   ),
-                  // "Your" - 3rd line 
+                  // "Your" - 3rd line
                   const Text(
                     "Your",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                       height: 0.9,
                     ),
                   ),
-                  // "Account" - 4th line 
+                  // "Account" - 4th line
                   const Text(
                     "Account",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: 40,
                       fontWeight: FontWeight.bold,
                       height: 0.9,
                     ),
@@ -213,21 +222,39 @@ class _SignUpState extends State<SignUp> {
             const SizedBox(height: 30),
 
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(50.0),
               child: Column(
                 children: [
                   // Full Name
-                  buildInputField("Full Name", Icons.person_outline, _fullNameController),
+                  buildInputField(
+                    "Full Name",
+                    Icons.person_outline,
+                    _fullNameController,
+                  ),
                   const SizedBox(height: 20),
                   // Email
-                  buildInputField("Email Address", Icons.email_outlined, _emailController,
-                      keyboardType: TextInputType.emailAddress),
+                  buildInputField(
+                    "Email Address",
+                    Icons.email_outlined,
+                    _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
                   const SizedBox(height: 20),
                   // Password
-                  buildInputField("Password", Icons.lock_outline, _passwordController, obscure: true),
+                  buildInputField(
+                    "Password",
+                    Icons.lock_outline,
+                    _passwordController,
+                    obscure: true,
+                  ),
                   const SizedBox(height: 20),
                   // Retype Password
-                  buildInputField("Retype Password", Icons.lock_outline, _retypePasswordController, obscure: true),
+                  buildInputField(
+                    "Retype Password",
+                    Icons.lock_outline,
+                    _retypePasswordController,
+                    obscure: true,
+                  ),
 
                   const SizedBox(height: 25),
 
@@ -241,19 +268,24 @@ class _SignUpState extends State<SignUp> {
                             agree = value ?? false;
                           });
                         },
-                        shape: const CircleBorder(),
-                        activeColor: Colors.blue,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                        ),
+                        activeColor: const Color.fromARGB(255, 37, 50, 56),
                       ),
                       Expanded(
                         child: RichText(
                           text: TextSpan(
-                            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
                             children: const [
                               TextSpan(text: 'I agree to the '),
                               TextSpan(
                                 text: 'Terms & Privacy',
                                 style: TextStyle(
-                                  color: Colors.blue,
+                                  color: Color.fromARGB(255, 37, 50, 56),
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
@@ -273,7 +305,7 @@ class _SignUpState extends State<SignUp> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _signUpUser,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2F4F4F),
+                        backgroundColor: const Color.fromARGB(255, 37, 50, 56),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -285,7 +317,9 @@ class _SignUpState extends State<SignUp> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : const Text(
@@ -318,7 +352,7 @@ class _SignUpState extends State<SignUp> {
                           TextSpan(
                             text: 'Log In',
                             style: TextStyle(
-                              color: Colors.blue,
+                              color: Color.fromARGB(255, 37, 50, 56),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -336,12 +370,20 @@ class _SignUpState extends State<SignUp> {
   }
 
   // Widget for input fields with controllers
-  Widget buildInputField(String hint, IconData icon, TextEditingController controller,
-      {bool obscure = false, TextInputType? keyboardType}) {
+  Widget buildInputField(
+    String hint,
+    IconData icon,
+    TextEditingController controller, {
+    bool obscure = false,
+    TextInputType? keyboardType,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[400]!),
-        borderRadius: BorderRadius.circular(25),
+        border: Border.all(
+          color: const Color.fromARGB(255, 37, 50, 56),
+          width: 2.0,
+        ),
+        borderRadius: BorderRadius.circular(35),
       ),
       child: TextField(
         controller: controller,
@@ -352,7 +394,10 @@ class _SignUpState extends State<SignUp> {
           hintStyle: TextStyle(color: Colors.grey[500]),
           prefixIcon: Icon(icon, color: Colors.grey[500]),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 15,
+          ),
         ),
       ),
     );
