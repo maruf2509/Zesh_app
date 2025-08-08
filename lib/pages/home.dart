@@ -7,7 +7,6 @@ import '../models/product.dart';
 
 import 'profile.dart';
 import 'search_results_screen.dart';
-import 'add_to_cart_screen.dart';
 import 'all_products_screen.dart';
 
 class Home extends StatefulWidget {

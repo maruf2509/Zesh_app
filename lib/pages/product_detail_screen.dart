@@ -1,5 +1,8 @@
+import 'package:zesh_app/pages/cart_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:zesh_app/models/product.dart';
+import 'package:zesh_app/providers/cart_provider.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -45,8 +48,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 onPressed: () {},
               ),
               IconButton(
-                icon: Icon(Icons.shopping_bag_outlined, color: Colors.black),
-                onPressed: () {},
+                icon: Icon(Icons.shopping_cart_rounded, color: Colors.black),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartScreen()),
+                  );
+                },
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -236,7 +244,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         padding: const EdgeInsets.all(20.0),
         child: ElevatedButton(
           onPressed: () {
-            // Add to cart functionality
+            if (_selectedSize != null) {
+              final cartProvider = Provider.of<CartProvider>(
+                context,
+                listen: false,
+              );
+              cartProvider.addItem(widget.product, _selectedSize!, _quantity);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Added ${widget.product.name} (${_selectedSize}) to cart!',
+                  ),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Please select a size.')));
+            }
           },
           child: Text('Add to Cart'),
           style: ElevatedButton.styleFrom(
