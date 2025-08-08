@@ -19,7 +19,7 @@ class AddToCartScreen extends StatelessWidget {
             Image.asset(product.image, height: 200),
             Text(product.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             Text(product.description),
-            Text('৳${product.price.toInt()}', style: const TextStyle(fontSize: 20, color: Colors.green)),
+            Text('৳${product.prices[product.sizes.first]?.toInt()}', style: const TextStyle(fontSize: 20, color: Colors.green)),
             ElevatedButton(
               onPressed: () {
                 // Add to cart logic here

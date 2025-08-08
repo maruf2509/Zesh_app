@@ -1,3 +1,4 @@
+import 'package:zesh_app/pages/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 
@@ -27,15 +28,18 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredProducts = demoProducts.where((product) {
-      final matchCategory = selectedCategory == 'All' || product.category == selectedCategory;
-      final matchPrice = product.price >= priceRange.start && product.price <= priceRange.end;
+      final matchCategory =
+          selectedCategory == 'All' || product.category == selectedCategory;
+      final matchPrice = product.prices.values.any(
+        (price) => price >= priceRange.start && price <= priceRange.end,
+      );
 
       if (selectedCategory != null && selectedCategory != 'All') {
-        // ব্র্যান্ড সিলেক্ট থাকলে searchQuery ignore করো
         return matchCategory && matchPrice;
       } else {
-        // ব্র্যান্ড সিলেক্ট না থাকলে searchQuery + price filter প্রযোজ্য
-        final matchSearch = product.name.toLowerCase().contains(widget.searchQuery.toLowerCase());
+        final matchSearch = product.name.toLowerCase().contains(
+          widget.searchQuery.toLowerCase(),
+        );
         return matchSearch && matchPrice;
       }
     }).toList();
@@ -44,9 +48,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     categories.insert(0, 'All');
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Search: "${widget.searchQuery}"'),
-      ),
+      appBar: AppBar(title: Text('Search: "${widget.searchQuery}"')),
       body: Column(
         children: [
           // Filter section
@@ -71,7 +73,9 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
-                Text('Price Range: ৳${tempPriceRange.start.round()} - ৳${tempPriceRange.end.round()}'),
+                Text(
+                  'Price Range: ৳${tempPriceRange.start.round()} - ৳${tempPriceRange.end.round()}',
+                ),
                 RangeSlider(
                   values: tempPriceRange,
                   min: 0,
@@ -126,10 +130,24 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                     itemBuilder: (context, index) {
                       final product = filteredProducts[index];
                       return ListTile(
-                        leading: Image.asset(product.image, width: 50, height: 50),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductDetailScreen(product: product),
+                            ),
+                          );
+                        },
+                        leading: Image.asset(
+                          product.image,
+                          width: 50,
+                          height: 50,
+                        ),
                         title: Text(product.name),
                         subtitle: Text(product.description),
-                        trailing: Text('৳${product.price}'),
+                        trailing: Text(
+                          '৳${product.prices[product.sizes.first]}',
+                        ),
                       );
                     },
                   ),

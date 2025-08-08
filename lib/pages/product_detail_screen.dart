@@ -70,7 +70,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ),
                       Text(
-                        '৳${widget.product.price.toInt()}',
+                        '৳${widget.product.prices[_selectedSize]?.toInt()}',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,

@@ -358,7 +358,7 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                           child: Text(
-                            '৳${product.price.toInt()}',
+                            '৳${product.prices[product.sizes.first]?.toInt()}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: _HomeState.kFontSizeMedium,

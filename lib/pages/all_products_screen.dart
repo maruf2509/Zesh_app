@@ -34,7 +34,7 @@ class AllProductsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text('৳${product.price.toInt()}', style: const TextStyle(color: Colors.green)),
+                      Text('৳${product.prices[product.sizes.first]?.toInt()}', style: const TextStyle(color: Colors.green)),
                     ],
                   ),
                 ),
