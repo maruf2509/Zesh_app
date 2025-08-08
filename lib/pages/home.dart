@@ -1,3 +1,4 @@
+import 'package:zesh_app/pages/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zesh_app/providers/favorites_provider.dart';
@@ -288,7 +289,7 @@ class _HomeState extends State<Home> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AddToCartScreen(product: product),
+            builder: (context) => ProductDetailScreen(product: product),
           ),
         );
       },
