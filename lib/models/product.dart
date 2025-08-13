@@ -25,7 +25,7 @@ List<Product> demoProducts = [
   Product(
     image: 'images/chanel.png',
     name: 'Bleu de Chanel',
-    description: 'Elegant, deep and refined - embodies timeless confidence',
+    description: 'Elegant, deep and refined \n- embodies timeless confidence',
     prices: {
       '3.5ml': 180.0,
       '6ml': 250.0,
@@ -39,7 +39,7 @@ List<Product> demoProducts = [
   Product(
     image: 'images/sauvage.png',
     name: 'Dior Sauvage',
-    description: 'Fresh, fierce and magnetic - captures raw masculinity',
+    description: 'Fresh, fierce and magnetic \n- captures raw masculinity',
     prices: {
       '3.5ml': 1000.0,
       '6ml': 1500.0,
@@ -53,7 +53,7 @@ List<Product> demoProducts = [
   Product(
     image: 'images/chanel.png',
     name: 'Chanel No. 5',
-    description: 'A classic floral aldehyde fragrance for women',
+    description: 'A classic floral aldehyde\nfragrance for women',
     prices: {
       '3.5ml': 1300.0,
       '6ml': 1900.0,
@@ -67,7 +67,7 @@ List<Product> demoProducts = [
   Product(
     image: 'images/sauvage.png',
     name: 'Aventus Creed',
-    description: 'A fresh, woody, and amber fragrance for men',
+    description: 'A fresh, woody, and amber\nfragrance for men',
     prices: {
       '3.5ml': 1500.0,
       '6ml': 2200.0,

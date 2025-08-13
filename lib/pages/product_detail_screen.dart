@@ -7,8 +7,7 @@ import 'package:zesh_app/providers/cart_provider.dart';
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
 
-  const ProductDetailScreen({Key? key, required this.product})
-    : super(key: key);
+  const ProductDetailScreen({super.key, required this.product});
 
   @override
   _ProductDetailScreenState createState() => _ProductDetailScreenState();
@@ -253,7 +252,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Added ${widget.product.name} (${_selectedSize}) to cart!',
+                    'Added ${widget.product.name} ($_selectedSize) to cart!',
                   ),
                 ),
               );
@@ -263,7 +262,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ).showSnackBar(SnackBar(content: Text('Please select a size.')));
             }
           },
-          child: Text('Add to Cart'),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color.fromARGB(255, 37, 50, 56),
             foregroundColor: Colors.white,
@@ -273,6 +271,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
+          child: Text('Add to Cart'),
         ),
       ),
     );

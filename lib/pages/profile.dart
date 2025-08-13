@@ -1,6 +1,7 @@
 import 'package:zesh_app/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:zesh_app/pages/edit_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -103,7 +104,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Text(_currentUser?.email ?? 'N/A', style: TextStyle(color: Colors.grey)),
         const SizedBox(height: 10),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+            ).then((_) {
+              // Refresh user data when returning from EditProfileScreen
+              setState(() {
+                _currentUser = FirebaseAuth.instance.currentUser;
+              });
+            });
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1A2A3A),
             shape: RoundedRectangleBorder(
