@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:zesh_app/widget/support_widget.dart';
+
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -58,7 +58,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _emailController.text = _currentUser!.email ?? '';
       }
     } catch (e) {
-      print('Error loading user data: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load user data: $e')),
       );
@@ -90,7 +89,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       TaskSnapshot snapshot = await uploadTask;
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      print('Error uploading image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to upload image: $e')),
       );
@@ -113,7 +111,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       String? newProfilePictureUrl = _profilePictureUrl;
       if (_selectedImage != null) {
-        newProfilePictureUrl = await _uploadImage();
+        String? uploadedUrl = await _uploadImage();
+        if (uploadedUrl == null) {
+          // If upload failed, keep the old URL and show an error
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to upload profile picture. Keeping old one.')),
+          );
+        } else {
+          newProfilePictureUrl = uploadedUrl;
+        }
       }
 
       Map<String, dynamic> userData = {
@@ -140,7 +146,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
       Navigator.pop(context); // Go back to profile screen
     } catch (e) {
-      print('Error saving profile: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save profile: $e')),
       );
@@ -189,7 +194,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ? FileImage(_selectedImage!)
                           : (_profilePictureUrl != null
                               ? NetworkImage(_profilePictureUrl!)
-                              : const AssetImage('images/logo.png')) as ImageProvider,
+                              : const AssetImage('images/logo.png'))
                       child: _selectedImage == null && _profilePictureUrl == null
                           ? Icon(Icons.camera_alt, size: 40, color: Colors.grey[600])
                           : null,
