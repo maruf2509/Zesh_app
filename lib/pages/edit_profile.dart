@@ -6,7 +6,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -42,8 +41,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     try {
-      DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(_currentUser!.uid).get();
+      DocumentSnapshot userDoc = await _firestore
+          .collection('users')
+          .doc(_currentUser.uid)
+          .get();
 
       if (userDoc.exists) {
         Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
@@ -54,13 +55,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _profilePictureUrl = userData['profilePictureUrl'];
       } else {
         // If user document doesn't exist, populate with Firebase Auth data
-        _nameController.text = _currentUser!.displayName ?? '';
-        _emailController.text = _currentUser!.email ?? '';
+        _nameController.text = _currentUser.displayName ?? '';
+        _emailController.text = _currentUser.email ?? '';
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load user data: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to load user data: $e')));
     } finally {
       setState(() {
         _isLoading = false;
@@ -85,22 +86,93 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       String fileName =
           'profile_pictures/${_currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      UploadTask uploadTask = _storage.ref().child(fileName).putFile(_selectedImage!);
+      UploadTask uploadTask = _storage
+          .ref()
+          .child(fileName)
+          .putFile(_selectedImage!);
       TaskSnapshot snapshot = await uploadTask;
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to upload image: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
       return null;
+    }
+  }
+
+  Future<bool> _reauthenticateUser() async {
+    String? password = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController passwordController = TextEditingController();
+        return AlertDialog(
+          title: const Text('Re-authenticate'),
+          content: TextField(
+            controller: passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Current Password'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Re-authenticate'),
+              onPressed: () {
+                Navigator.of(context).pop(passwordController.text);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (password == null || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Re-authentication cancelled or no password entered.')),
+      );
+      return false;
+    }
+
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: _currentUser!.email!,
+        password: password,
+      );
+      await _currentUser!.reauthenticateWithCredential(credential);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Re-authentication successful.')),
+      );
+      return true;
+    } on FirebaseAuthException catch (e) {
+      String message;
+      if (e.code == 'wrong-password') {
+        message = 'Incorrect password. Please try again.';
+      } else if (e.code == 'user-not-found') {
+        message = 'User not found.';
+      } else {
+        message = 'Re-authentication failed: ${e.message}';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+      return false;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An unexpected error occurred during re-authentication: $e')),
+      );
+      return false;
     }
   }
 
   Future<void> _saveProfile() async {
     if (_currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No user logged in.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No user logged in.')));
       return;
     }
 
@@ -115,7 +187,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (uploadedUrl == null) {
           // If upload failed, keep the old URL and show an error
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to upload profile picture. Keeping old one.')),
+            const SnackBar(
+              content: Text(
+                'Failed to upload profile picture. Keeping old one.',
+              ),
+            ),
           );
         } else {
           newProfilePictureUrl = uploadedUrl;
@@ -130,15 +206,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'profilePictureUrl': newProfilePictureUrl,
       };
 
-      await _firestore.collection('users').doc(_currentUser!.uid).set(userData, SetOptions(merge: true));
+      await _firestore
+          .collection('users')
+          .doc(_currentUser.uid)
+          .set(userData, SetOptions(merge: true));
 
       // Update Firebase Auth profile if name or email changed
-      if (_currentUser!.displayName != _nameController.text ||
-          _currentUser!.email != _emailController.text) {
+      if (_currentUser!.displayName != _nameController.text) {
         await _currentUser!.updateDisplayName(_nameController.text);
-        // Note: Updating email directly via updateEmail requires re-authentication.
-        // For simplicity, we're only updating it in Firestore here.
-        // If full email update is needed, a re-auth flow should be implemented.
+      }
+
+      if (_currentUser!.email != _emailController.text) {
+        bool reauthenticated = await _reauthenticateUser();
+        if (!reauthenticated) {
+          setState(() {
+            _isLoading = false;
+          });
+          return; // Stop if re-authentication failed
+        }
+        try {
+          await _currentUser!.updateEmail(_emailController.text);
+        } on FirebaseAuthException catch (e) {
+          String message;
+          if (e.code == 'email-already-in-use') {
+            message = 'The new email address is already in use by another account.';
+          } else if (e.code == 'invalid-email') {
+            message = 'The new email address is invalid.';
+          } else {
+            message = 'Failed to update email: ${e.message}';
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+          return; // Stop if email update failed
+        }
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -146,9 +250,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
       Navigator.pop(context); // Go back to profile screen
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save profile: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to save profile: $e')));
     } finally {
       setState(() {
         _isLoading = false;
@@ -176,7 +280,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Edit Profile', style: TextStyle(color: Colors.black)),
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -193,10 +300,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       backgroundImage: _selectedImage != null
                           ? FileImage(_selectedImage!)
                           : (_profilePictureUrl != null
-                              ? NetworkImage(_profilePictureUrl!)
-                              : const AssetImage('images/logo.png')),
-                      child: _selectedImage == null && _profilePictureUrl == null
-                          ? Icon(Icons.camera_alt, size: 40, color: Colors.grey[600])
+                                ? NetworkImage(_profilePictureUrl!)
+                                : const AssetImage('images/logo.png')),
+                      child:
+                          _selectedImage == null && _profilePictureUrl == null
+                          ? Icon(
+                              Icons.camera_alt,
+                              size: 40,
+                              color: Colors.grey[600],
+                            )
                           : null,
                     ),
                   ),
@@ -212,7 +324,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     label: 'Email',
                     icon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
-                    readOnly: true, // Email usually not directly editable via profile
+                    readOnly: false, // Email can now be edited
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
@@ -236,7 +348,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
