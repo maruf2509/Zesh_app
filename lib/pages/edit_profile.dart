@@ -194,7 +194,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ? FileImage(_selectedImage!)
                           : (_profilePictureUrl != null
                               ? NetworkImage(_profilePictureUrl!)
-                              : const AssetImage('images/logo.png'))
+                              : const AssetImage('images/logo.png')),
                       child: _selectedImage == null && _profilePictureUrl == null
                           ? Icon(Icons.camera_alt, size: 40, color: Colors.grey[600])
                           : null,
