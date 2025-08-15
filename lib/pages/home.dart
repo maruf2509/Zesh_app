@@ -1,10 +1,12 @@
-import 'package:zesh_app/pages/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zesh_app/pages/cart_screen.dart';
+import 'package:zesh_app/pages/favorites_screen.dart';
+import 'package:zesh_app/pages/notifications_screen.dart';
+import 'package:zesh_app/pages/product_detail_screen.dart';
 import 'package:zesh_app/providers/favorites_provider.dart';
 
 import '../models/product.dart';
-
 import 'profile.dart';
 import 'search_results_screen.dart';
 import 'all_products_screen.dart';
@@ -17,6 +19,63 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    HomeScreen(),
+    FavoritesScreen(),
+    CartScreen(),
+    NotificationsScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favourite',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notification',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   late PageController _pageController;
 
   // Define constants for consistent spacing and styling
@@ -47,7 +106,7 @@ class _HomeState extends State<Home> {
         child: ListView(
           children: [
             SizedBox(
-              height: _HomeState.kVerticalSpacing,
+              height: _HomeScreenState.kVerticalSpacing,
             ), // Initial spacing from top
             _buildHeader(context),
             Padding(
@@ -61,7 +120,7 @@ class _HomeState extends State<Home> {
             ),
             _buildBanner(),
             SizedBox(
-              height: _HomeState.kVerticalSpacing * 1.5,
+              height: _HomeScreenState.kVerticalSpacing * 1.5,
             ), // More space before product section
             _buildProductSection(context),
           ],
@@ -73,12 +132,12 @@ class _HomeState extends State<Home> {
   Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: _HomeState.kHorizontalPadding,
+        horizontal: _HomeScreenState.kHorizontalPadding,
       ),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.menu, size: _HomeState.kIconSize),
+            icon: const Icon(Icons.menu, size: _HomeScreenState.kIconSize),
             onPressed: () {
               Navigator.push(
                 context,
@@ -103,7 +162,7 @@ class _HomeState extends State<Home> {
                 suffixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(
-                    _HomeState.kBorderRadius * 2,
+                    _HomeScreenState.kBorderRadius * 2,
                   ),
                   borderSide: BorderSide.none,
                 ),
@@ -124,7 +183,7 @@ class _HomeState extends State<Home> {
   Widget _buildBanner() {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: _HomeState.kHorizontalPadding,
+        horizontal: _HomeScreenState.kHorizontalPadding,
       ),
       child: Container(
         height: 370,
@@ -133,7 +192,7 @@ class _HomeState extends State<Home> {
             image: AssetImage('images/banner.png'),
             fit: BoxFit.cover,
           ),
-          borderRadius: BorderRadius.circular(_HomeState.kBorderRadius),
+          borderRadius: BorderRadius.circular(_HomeScreenState.kBorderRadius),
         ),
       ),
     );
@@ -146,7 +205,7 @@ class _HomeState extends State<Home> {
       children: [
         _buildSectionHeader(context, 'NEW PERFUME SERIES'),
         SizedBox(
-          height: _HomeState.kVerticalSpacing * 0.5,
+          height: _HomeScreenState.kVerticalSpacing * 0.5,
         ), // Spacing between header and carousel
         Stack(
           alignment: Alignment.center,
@@ -182,11 +241,11 @@ class _HomeState extends State<Home> {
           ],
         ),
         SizedBox(
-          height: _HomeState.kVerticalSpacing * 1.5,
+          height: _HomeScreenState.kVerticalSpacing * 1.5,
         ), // Spacing between sections
         _buildSectionHeader(context, 'MOST POPULAR'),
         SizedBox(
-          height: _HomeState.kVerticalSpacing * 0.5,
+          height: _HomeScreenState.kVerticalSpacing * 0.5,
         ), // Spacing between header and grid
         _buildProductGrid(),
       ],
@@ -196,7 +255,7 @@ class _HomeState extends State<Home> {
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: _HomeState.kHorizontalPadding,
+        horizontal: _HomeScreenState.kHorizontalPadding,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -204,7 +263,7 @@ class _HomeState extends State<Home> {
           Text(
             title,
             style: const TextStyle(
-              fontSize: _HomeState.kFontSizeLarge,
+              fontSize: _HomeScreenState.kFontSizeLarge,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -220,7 +279,7 @@ class _HomeState extends State<Home> {
               },
               child: const Text(
                 'View All',
-                style: TextStyle(fontSize: _HomeState.kFontSizeMedium),
+                style: TextStyle(fontSize: _HomeScreenState.kFontSizeMedium),
               ),
             ),
         ],
@@ -240,11 +299,11 @@ class _HomeState extends State<Home> {
           return Padding(
             padding: EdgeInsets.only(
               left: index == 0
-                  ? _HomeState.kHorizontalPadding
-                  : _HomeState.kHorizontalPadding / 2,
+                  ? _HomeScreenState.kHorizontalPadding
+                  : _HomeScreenState.kHorizontalPadding / 2,
               right: index == demoProducts.length - 1
-                  ? _HomeState.kHorizontalPadding
-                  : _HomeState.kHorizontalPadding / 2,
+                  ? _HomeScreenState.kHorizontalPadding
+                  : _HomeScreenState.kHorizontalPadding / 2,
             ),
             child: _buildProductCard(product),
           );
@@ -256,7 +315,7 @@ class _HomeState extends State<Home> {
   Widget _buildProductGrid() {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: _HomeState.kHorizontalPadding,
+        horizontal: _HomeScreenState.kHorizontalPadding,
       ),
       child: GridView.builder(
         shrinkWrap: true,
@@ -265,9 +324,9 @@ class _HomeState extends State<Home> {
           crossAxisCount: 2,
           childAspectRatio: 0.7, // Adjusted aspect ratio for grid items
           crossAxisSpacing:
-              _HomeState.kHorizontalPadding /
+              _HomeScreenState.kHorizontalPadding /
               2, // Spacing between grid items horizontally
-          mainAxisSpacing: _HomeState
+          mainAxisSpacing: _HomeScreenState
               .kVerticalSpacing, // Spacing between grid items vertically
         ),
         itemCount: demoProducts.length,
@@ -296,7 +355,7 @@ class _HomeState extends State<Home> {
         elevation: 0, // Removed elevation
         color: Colors.transparent, // Made background transparent
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(_HomeState.kBorderRadius),
+          borderRadius: BorderRadius.circular(_HomeScreenState.kBorderRadius),
         ),
         margin: EdgeInsets.zero, // Remove default card margin
         child: SizedBox(
@@ -307,15 +366,15 @@ class _HomeState extends State<Home> {
               Expanded(
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(_HomeState.kBorderRadius),
-                    topRight: Radius.circular(_HomeState.kBorderRadius),
+                    topLeft: Radius.circular(_HomeScreenState.kBorderRadius),
+                    topRight: Radius.circular(_HomeScreenState.kBorderRadius),
                   ),
                   child: Image.asset(product.image, fit: BoxFit.cover),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(
-                  _HomeState.kHorizontalPadding / 2,
+                  _HomeScreenState.kHorizontalPadding / 2,
                 ), // Consistent padding inside card
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -324,7 +383,7 @@ class _HomeState extends State<Home> {
                       product.name,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: _HomeState.kFontSizeMedium,
+                        fontSize: _HomeScreenState.kFontSizeMedium,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -332,7 +391,7 @@ class _HomeState extends State<Home> {
                       product.description,
                       style: const TextStyle(
                         color: Colors.grey,
-                        fontSize: _HomeState.kFontSizeSmall,
+                        fontSize: _HomeScreenState.kFontSizeSmall,
                       ),
                       maxLines: 1, // Limit description to one line
                       overflow:
@@ -353,14 +412,14 @@ class _HomeState extends State<Home> {
                             color: Colors.white,
                             border: Border.all(color: Colors.grey, width: 1),
                             borderRadius: BorderRadius.circular(
-                              _HomeState.kBorderRadius * 1.5,
+                              _HomeScreenState.kBorderRadius * 1.5,
                             ),
                           ),
                           child: Text(
                             '৳${product.prices[product.sizes.first]?.toInt()}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: _HomeState.kFontSizeMedium,
+                              fontSize: _HomeScreenState.kFontSizeMedium,
                             ),
                           ),
                         ),
@@ -369,7 +428,7 @@ class _HomeState extends State<Home> {
                             isFavorite ? Icons.favorite : Icons.favorite_border,
                             color: isFavorite ? Colors.red : Colors.grey,
                             size:
-                                _HomeState.kIconSize *
+                                _HomeScreenState.kIconSize *
                                 0.8, // Smaller icon for product card
                           ),
                           onPressed: () {
