@@ -1,7 +1,9 @@
-import 'package:zesh_app/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:zesh_app/pages/edit_profile.dart';
+import 'package:zesh_app/pages/login.dart';
+import 'package:zesh_app/providers/theme_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,7 +13,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isDarkMode = false;
   User? _currentUser;
 
   @override
@@ -22,20 +23,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.themeMode == ThemeMode.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.grey[100],
+        backgroundColor: Theme.of(context).colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onBackground),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Profile', style: TextStyle(color: Colors.black)),
+        title: Text('Profile', style: TextStyle(color: Theme.of(context).colorScheme.onBackground)),
       ),
       body: ListView(
         children: [
-          _buildProfileHeader(),
+          _buildProfileHeader(isDarkMode),
           const SizedBox(height: 20),
           _buildProfileItem(
             icon: Icons.logout,
@@ -52,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(color: Colors.grey, fontSize: 16),
             ),
           ),
-          _buildDarkModeToggle(),
+          _buildDarkModeToggle(themeProvider, isDarkMode),
           _buildProfileItem(
             icon: Icons.language,
             text: 'Language',
@@ -88,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(bool isDarkMode) {
     return Column(
       children: [
         const CircleAvatar(
@@ -98,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 10),
         Text(
           _currentUser?.displayName ?? 'N/A',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onBackground),
         ),
         const SizedBox(height: 5),
         Text(_currentUser?.email ?? 'N/A', style: TextStyle(color: Colors.grey)),
@@ -136,36 +140,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.grey[600]),
-      title: Text(text),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6)),
+      title: Text(text, style: TextStyle(color: Theme.of(context).colorScheme.onBackground)),
       trailing: Icon(
         Icons.arrow_forward_ios,
         size: 16,
-        color: Colors.grey[600],
+        color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6),
       ),
       onTap: onTap,
     );
   }
 
-  Widget _buildDarkModeToggle() {
+  Widget _buildDarkModeToggle(ThemeProvider themeProvider, bool isDarkMode) {
     return ListTile(
-      leading: Icon(Icons.brightness_6_outlined, color: Colors.grey[600]),
+      leading: Icon(Icons.brightness_6_outlined, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6)),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('Mode'),
-          Text(
+        children: [
+          Text('Mode', style: TextStyle(color: Theme.of(context).colorScheme.onBackground)),
+          const Text(
             'Dark & Light',
             style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
       ),
       trailing: Switch(
-        value: _isDarkMode,
+        value: isDarkMode,
         onChanged: (value) {
-          setState(() {
-            _isDarkMode = value;
-          });
+          themeProvider.toggleTheme(value);
         },
         activeColor: Colors.blue,
       ),
